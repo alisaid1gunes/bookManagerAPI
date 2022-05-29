@@ -1,3 +1,4 @@
+import configuration from '../config/configuration';
 export const jwtConstants = {
-  secret: 'secretKey',
+  secret: configuration().jwtSecret,
 };
