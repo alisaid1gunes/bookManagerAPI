@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import helmet from 'helmet';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import configuration from './config/configuration';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
@@ -42,6 +43,6 @@ async function bootstrap() {
   app.enableCors();
   app.use(helmet());
 
-  await app.listen(3000);
+  await app.listen(configuration().port);
 }
 bootstrap();
