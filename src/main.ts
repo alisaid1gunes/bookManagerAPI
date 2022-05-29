@@ -1,12 +1,22 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ValidationPipe } from '@nestjs/common';
+import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import helmet from 'helmet';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
   app.useGlobalPipes(
     new ValidationPipe({
+      exceptionFactory: (errors) => {
+        const errorMessages = {};
+        errors.forEach((error) => {
+          errorMessages[error.property] = Object.values(error.constraints)
+            .join('. ')
+            .trim();
+        });
+        return new BadRequestException(errorMessages);
+      },
       whitelist: true,
       forbidNonWhitelisted: true,
       forbidUnknownValues: true,
@@ -19,6 +29,7 @@ async function bootstrap() {
       transform: true,
     }),
   );
+
   const config = new DocumentBuilder()
     .setTitle('Users and Books')
     .setDescription('The Users and Books API description')
@@ -27,8 +38,10 @@ async function bootstrap() {
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
+
   app.enableCors();
   app.use(helmet());
+
   await app.listen(3000);
 }
 bootstrap();

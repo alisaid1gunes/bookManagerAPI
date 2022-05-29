@@ -1,4 +1,13 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateBookDto } from './create-book.dto';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
-export class UpdateBookDto extends PartialType(CreateBookDto) {}
+export class UpdateBookDto {
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  public name: string;
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsNumber()
+  public pageCount: number;
+}

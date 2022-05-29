@@ -18,22 +18,60 @@ export class BooksService {
     book.name = createBookDto.name;
     book.pageCount = createBookDto.pageCount;
     book.user = createBookDto.userId;
-    return this.booksRepository.save(book);
+    const createdBook = await this.booksRepository.save(book);
+    if (createdBook === undefined || createdBook === null) {
+      return {
+        success: false,
+        message: 'Book not created',
+      };
+    }
+    return { success: true, message: 'Book created', data: createdBook };
   }
 
-  findAll() {
-    return this.booksRepository.find({ relations: ['user'] });
+  async findAll() {
+    const books = await this.booksRepository.find({ relations: ['user'] });
+    if (books === undefined || books === null) {
+      return {
+        success: false,
+        message: 'Book not found',
+      };
+    }
+    return { success: true, message: 'Book found', data: books };
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} book`;
+  async findOne(id: number) {
+    const book = await this.booksRepository.find({
+      relations: ['user'],
+      where: { id },
+    });
+    if (book === undefined || book === null) {
+      return {
+        success: false,
+        message: 'Book not found',
+      };
+    }
+    return { success: true, message: 'Book found', data: book };
   }
 
-  update(id: number, updateBookDto: UpdateBookDto) {
-    return `This action updates a #${id} book`;
+  async update(id: number, updateBookDto: UpdateBookDto) {
+    const updateResult = await this.booksRepository.update(id, updateBookDto);
+    if (updateResult.affected === 0) {
+      return {
+        success: false,
+        message: 'Book not updated',
+      };
+    }
+    return { success: true, message: 'Book updated' };
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} book`;
+  async remove(id: number) {
+    const deleteResult = await this.booksRepository.delete(id);
+    if (deleteResult.affected === 0) {
+      return {
+        success: false,
+        message: 'Book not deleted',
+      };
+    }
+    return { success: true, message: 'Book deleted' };
   }
 }
